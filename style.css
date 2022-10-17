@@ -1,0 +1,89 @@
+* {
+  font-family: sans-serif;
+}
+#game {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+#startBtn {
+  width: 200px;
+  height: 100px;
+  border: solid black 2px;
+  font-size: 30px;
+}
+#label {
+  left: 0;
+  top: 0;
+  display: inline-block;
+  border: solid black 2px;
+  font-size: 30px;
+  text-align: center;
+}
+#designCanvas {
+  width: 400px;
+  height: 800px;
+  border: solid black 2px;
+  display: inline-block;
+}
+.designSlot {
+  border: solid black 2px;
+  display: inline-block;
+  position: absolute;
+}
+#selectors {
+  width: 100px;
+  height: 322px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-align: center;
+  font-size: 20px;
+}
+.selector {
+  width: 400px;
+  height: 100px;
+  text-align: left;
+  transition: 0.5s transform;
+  display: flex;
+}
+.tabBtn {
+  min-width: 100px;
+  max-width:100px;
+}
+.selectOptions {
+  background: #88888888;
+  flex-grow: 1;
+  overflow:hidden;
+}
+.optionsCont {
+  animation: scroll infinite linear;
+  width: fit-content;
+  white-space: nowrap;
+}
+.eleOption {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  white-space: normal;
+}
+.centered {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+@keyframes scroll {
+  from {
+    transform: translate(0,0);
+  }
+  to {
+    transform: translate(calc(300px - 100%),0);
+  }
+}
+@font-face {
+    font-family: 'Lucida';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/Lucida.ttf') format('ttf');
+}

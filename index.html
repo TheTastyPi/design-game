@@ -1,8 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="style.css"></link>
   </head>
   <body>
-    test
+    <div id="everything">
+      <button id="startBtn" class="centered" onclick="init()" v-if="!gameData.init">Start Game</button>
+      <div id="game" class="centered" v-if="gameData.init">
+        <div id="label">
+          LEVEL {{gameData.level+1}}<br>
+          {{ms2str(gameData.timer)}}
+        </div>
+        <div id="designCanvas" class="centered">
+          <div class="designSlot" 
+          v-for="slot in levels[gameData.level]" 
+          v-bind:style="{left:slot.x+'px',top:slot.y+'px',width:slot.w+'px',height:slot.h+'px'}"></div>
+        </div>
+        <div id="selectors">
+          Elements
+          <div class="selector" v-bind:style="{transform:tabOpen === 'shapes'?'translate(-300px,0)':''}">
+            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='shapes'?'shapes':''">Shapes & Lines</button>
+            <div class="selectOptions">
+              <div class="optionsCont" v-bind:style="{animationDuration: options.shapes.length + 's'}">
+                <div v-for="option in options.shapes.concat(options.shapes.slice(0,3))" class="eleOption">{{option.name}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="selector" v-bind:style="{transform:tabOpen === 'images'?'translate(-300px,0)':''}">
+            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='images'?'images':''">Images</button>
+            <div class="selectOptions">options here</div>
+          </div>
+          <div class="selector" v-bind:style="{transform:tabOpen === 'fonts'?'translate(-300px,0)':''}">
+            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='fonts'?'fonts':''">Text</button>
+            <div class="selectOptions">
+              <div class="optionsCont" v-bind:style="{animationDuration: options.fonts.length + 's'}">
+                <div v-for="option in options.fonts.concat(options.fonts.slice(0,3))" class="eleOption" v-bind:style="{fontFamily: option.name}">{{option.name}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="propEdit" v-if="gameData.selected"></div>
+      </div>
+    </div>
   </body>
+  <script src="vue.js"></script>
+  <script src="layout.js"></script>
+  <script src="eleSelect.js"></script>
+  <script src="base.js"></script>
+  <script src="init.js"></script>
 </html>
