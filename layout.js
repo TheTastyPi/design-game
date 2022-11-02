@@ -2,6 +2,14 @@ const levels = [
   [
     {
       priority: 1,
+      x: 0,
+      y: 0,
+      w: 400,
+      h: 800,
+      type: "image"
+    },
+    {
+      priority: 1,
       x: 50,
       y: 25,
       w: 300,

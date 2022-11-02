@@ -23,13 +23,15 @@
 #designCanvas {
   width: 400px;
   height: 800px;
-  border: solid black 2px;
   display: inline-block;
 }
 .designSlot {
   border: solid black 2px;
   display: inline-block;
   position: absolute;
+}
+.slotFilled {
+  border: solid transparent 2px !important;
 }
 #selectors {
   width: 100px;
@@ -60,12 +62,68 @@
   animation: scroll infinite linear;
   width: fit-content;
   white-space: nowrap;
+  transition: 0.5s transform;
+}
+.tabOpen {
+  transform: translate(-300px, 0);
+}
+.animationStop {
+  animation: initial;
 }
 .eleOption {
   display: inline-block;
   width: 100px;
   height: 100px;
   white-space: normal;
+  position: relative;
+  vertical-align: top;
+  text-align: center;
+}
+.rectangle {
+  width: 100px;
+  height: 100px;
+  background: lightblue;
+}
+.circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: lightblue;
+}
+.triangle {
+  width: 0;
+  height: 0;
+  border-bottom: solid 100px lightblue;
+  border-left: solid 50px transparent;
+  border-right: solid 50px transparent;
+}
+.line {
+  width: 100px;
+  height: 5px;
+  background: lightblue;
+}
+textarea {
+  border: none;
+  outline: none;
+  resize: none;
+}
+#propEdit {
+  width: 100px;
+  height: auto;
+  position: absolute;
+  left: 0;
+  top: 72px;
+  font-size: 20px;
+}
+#propEdit > div,
+#propEdit > span > div {
+  background: lightgray;
+}
+input {
+  width: 75px;
+}
+input[type="radio"] {
+  width: 10px;
 }
 .centered {
   position: absolute;
@@ -79,6 +137,28 @@
   }
   to {
     transform: translate(calc(300px - 100%), 0);
+  }
+}
+.blinking {
+  animation: blink 1s infinite steps(2, jump-none);
+}
+@keyframes blink {
+  from {
+    border-color: black;
+  }
+  to {
+    border-color: red;
+  }
+}
+.selected {
+  animation: selectblink 1s infinite steps(2, jump-none);
+}
+@keyframes selectblink {
+  from {
+    box-shadow: none;
+  }
+  to {
+    box-shadow: blue 0 0 0 2px;
   }
 }
 @font-face {

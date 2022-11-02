@@ -7,39 +7,129 @@
     <div id="everything">
       <button id="startBtn" class="centered" onclick="init()" v-if="!gameData.init">Start Game</button>
       <div id="game" class="centered" v-if="gameData.init">
-        <div id="label">
-          LEVEL {{gameData.level+1}}<br>
-          {{ms2str(gameData.timer)}}
-        </div>
         <div id="designCanvas" class="centered">
           <div class="designSlot" 
-          v-for="slot in levels[gameData.level]" 
-          v-bind:style="{left:slot.x+'px',top:slot.y+'px',width:slot.w+'px',height:slot.h+'px'}"></div>
+          v-for="(slot,index) in levels[gameData.level]"
+          v-bind:class="[gameData.selected?'blinking':'',f.getEle(index)?'slotFilled':'']"
+          v-bind:style="{
+            left:slot.x+'px',
+            top:slot.y+'px',
+            width:slot.w+'px',
+            height:slot.h+'px',
+            zIndex:f.getEle(index)?0:-99999
+          }"
+          v-on:click="f.interactEle(index)"
+          >
+            <div v-if="f.getEle(index)?.type === 'shape'"
+            v-bind:class="[f.getEle(index).name,gameData.editSelect === f.getEle(index)?'selected':'']"
+            v-bind:style="{
+              backgroundColor:f.getEle(index).name!=='triangle'?f.getEle(index).color+f.opa2hex(f.getEle(index).opacity):'',
+              borderBottomColor:f.getEle(index).name==='triangle'?f.getEle(index).color+f.opa2hex(f.getEle(index).opacity):'',
+              zIndex:f.getEle(index).zIndex,
+              transform:`
+                translate(calc(${f.getEle(index).translateX}px - 50%),calc(${f.getEle(index).translateY}px - 50%)) 
+                rotate(${f.getEle(index).angle}deg) 
+                scale(${f.getEle(index).scaleX},${f.getEle(index).scaleY})
+              `
+            }"
+            class="centered"></div>
+            <textarea v-if="f.getEle(index)?.type === 'text'"
+            v-bind:class="[gameData.editSelect === f.getEle(index)?'selected':'']"
+            v-bind:style="{
+              color:f.getEle(index).color+f.opa2hex(f.getEle(index).opacity),
+              zIndex:f.getEle(index).zIndex,
+              fontFamily:f.getEle(index).name,
+              transform:`
+                translate(${f.getEle(index).translateX}px,${f.getEle(index).translateY}px) 
+                rotate(${f.getEle(index).angle}deg) 
+                scale(${f.getEle(index).scaleX},${f.getEle(index).scaleY})
+              `,
+              resize: gameData.editSelect === f.getEle(index)?'both':'',
+              width:slot.w+'px',
+              height:slot.h+'px',
+              fontSize:f.getEle(index).fontSize+'px',
+              textAlign:f.getEle(index).textAlign
+            }"
+            v-on:keydown.stop
+            >{{f.getEle(index).name}}</textarea>
+          </div>
         </div>
         <div id="selectors">
           Elements
-          <div class="selector" v-bind:style="{transform:tabOpen === 'shapes'?'translate(-300px,0)':''}">
-            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='shapes'?'shapes':''">Shapes & Lines</button>
+          <div class="selector" v-bind:class="[tabOpen === 'shapes'?'tabOpen':'']" v-bind:style="{transform:gameData.selected?.type === 'shape'?'translate(-100px,0)':''}">
+            <button class="tabBtn" v-on:click="f.openTab('shapes')">Shapes & Lines</button>
             <div class="selectOptions">
-              <div class="optionsCont" v-bind:style="{animationDuration: options.shapes.length + 's'}">
-                <div v-for="option in options.shapes.concat(options.shapes.slice(0,3))" class="eleOption">{{option.name}}</div>
+              <div
+                id="shapeOptions"
+                class="optionsCont"
+                v-bind:class="[gameData.selected?.type === 'shape'?'animationStop':'']"
+                v-bind:style="{
+                  animationDuration: options.shapes.length + 's',
+                  transform:'translate(-'+gameData.selectIndex*100+'px,0)'
+                }"
+              >
+                <div v-for="(option, index) in options.shapes.concat(options.shapes.slice(0,3))" class="eleOption" v-on:click="f.selectEle(option,parseInt(index)%options.shapes.length)">
+                  <div v-bind:class="[option.name, 'centered']"></div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="selector" v-bind:style="{transform:tabOpen === 'images'?'translate(-300px,0)':''}">
-            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='images'?'images':''">Images</button>
+          <div class="selector" v-bind:class="[tabOpen === 'images'?'tabOpen':'']" v-bind:style="{transform:gameData.selected?.type === 'image'?'translate(-100px,0)':''}">
+            <button class="tabBtn" v-on:click="f.openTab('images')">Images</button>
             <div class="selectOptions">options here</div>
           </div>
-          <div class="selector" v-bind:style="{transform:tabOpen === 'fonts'?'translate(-300px,0)':''}">
-            <button class="tabBtn" v-on:click="tabOpen = tabOpen!=='fonts'?'fonts':''">Text</button>
+          <div class="selector" v-bind:class="[tabOpen === 'fonts'?'tabOpen':'']" v-bind:style="{transform:gameData.selected?.type === 'text'?'translate(-100px,0)':''}">
+            <button class="tabBtn" v-on:click="f.openTab('fonts')">Text</button>
             <div class="selectOptions">
-              <div class="optionsCont" v-bind:style="{animationDuration: options.fonts.length + 's'}">
-                <div v-for="option in options.fonts.concat(options.fonts.slice(0,3))" class="eleOption" v-bind:style="{fontFamily: option.name}">{{option.name}}</div>
+              <div 
+                id="textOptions"
+                class="optionsCont" 
+                v-bind:class="[gameData.selected?.type === 'text'?'animationStop':'']" 
+                v-bind:style="{
+                  animationDuration: options.fonts.length + 's',
+                  transform:'translate(-'+gameData.selectIndex*100+'px,0)'
+                }"
+              >
+                <div v-for="(option, index) in options.fonts.concat(options.fonts.slice(0,3))" class="eleOption" v-bind:style="{fontFamily: option.name}" v-on:click="f.selectEle(option,parseInt(index)%options.fonts.length)">{{option.name}}</div>
               </div>
             </div>
           </div>
         </div>
-        <div id="propEdit" v-if="gameData.selected"></div>
+        <div id="propEdit" v-if="gameData.editSelect" v-on:keydown.stop>
+          <div>Position</div>
+          x:<input style="width:50px;" v-model="gameData.editSelect.translateX"></input>px<br>
+          <input type="range" min="-500" max="500" step="1" v-model="gameData.editSelect.translateX"></input><br>
+          y:<input style="width:50px;" v-model="gameData.editSelect.translateY"></input>px<br>
+          <input type="range" min="-500" max="500" step="1" v-model="gameData.editSelect.translateY"></input>
+          <div>Size</div>
+          x:<input v-model="gameData.editSelect.scaleX"></input><br>
+          <input type="range" min="0" max="10" step="0.01" v-model="gameData.editSelect.scaleX"></input><br>
+          y:<input v-model="gameData.editSelect.scaleY"></input><br>
+          <input type="range" min="0" max="10" step="0.01" v-model="gameData.editSelect.scaleY"></input>
+          <div>Rotation</div>
+          <input style="width:50px;" v-model="gameData.editSelect.angle"></input>deg<br>
+          <input type="range" min="-180" max="180" step="1" v-model="gameData.editSelect.angle"></input><br>
+          <div>Arrange</div>
+          z:<input v-model="gameData.editSelect.zIndex"></input>
+          <div>Color</div>
+          <input type="color" v-model="gameData.editSelect.color"></input>
+          <div>Opacity</div>
+          <input v-model="gameData.editSelect.opacity"></input><br>
+          <input type="range" min="0" max="1" step="0.01" v-model="gameData.editSelect.opacity"></input>
+          <span v-if="gameData.editSelect.type === 'text'">
+            <div>Font Size</div>
+            <input style="width:50px" v-model="gameData.editSelect.fontSize"></input>px<br>
+            <input type="range" min="0" max="100" step="1" v-model="gameData.editSelect.fontSize"></input>
+            <div>Alignment</div>
+            <input type="radio" v-model="gameData.editSelect.textAlign" value="left">Left</input><br>
+            <input type="radio" v-model="gameData.editSelect.textAlign" value="center">Center</input>
+            <input type="radio" v-model="gameData.editSelect.textAlign" value="right">Right</input>
+          </span>
+        </div>
+        <div id="label">
+          LEVEL {{gameData.level+1}}<br>
+          {{f.ms2str(gameData.timer)}}
+        </div>
       </div>
     </div>
   </body>
