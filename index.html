@@ -10,48 +10,50 @@
         <div id="designCanvas" class="centered">
           <div class="designSlot" 
           v-for="(slot,index) in levels[gameData.level]"
-          v-bind:class="[gameData.selected?'blinking':'',f.getEle(index)?'slotFilled':'']"
+          v-bind:class="[gameData.selected?'blinking':'',gameData.designs[gameData.level].length >= 10?'slotFilled':'']"
           v-bind:style="{
             left:slot.x+'px',
             top:slot.y+'px',
             width:slot.w+'px',
             height:slot.h+'px',
-            zIndex:f.getEle(index)?0:-99999
+            zIndex:gameData.selected?9999999:''
           }"
-          v-on:click="f.interactEle(index)"
+          v-on:click="f.placeEle(index)"
           >
-            <div v-if="f.getEle(index)?.type === 'shape'"
-            v-bind:class="[f.getEle(index).name,gameData.editSelect === f.getEle(index)?'selected':'']"
+          </div>
+          <div v-for="(ele, index) in gameData.designs[gameData.level]" 
+          v-on:click="f.editEle(ele)"
+          style="position:absolute"
+          v-bind:style="{
+            zIndex:ele.zIndex,
+            transform:`
+              translate(${ele.translateX}px,${ele.translateY}px) 
+              rotate(${ele.angle}deg) 
+              scale(${ele.scaleX},${ele.scaleY})
+            `,
+            resize: gameData.editSelect === ele?'both':'',
+          }">
+            <div v-if="ele?.type === 'shape'"
+            v-bind:class="[ele.name,gameData.editSelect === ele?'selected':'']"
             v-bind:style="{
-              backgroundColor:f.getEle(index).name!=='triangle'?f.getEle(index).color+f.opa2hex(f.getEle(index).opacity):'',
-              borderBottomColor:f.getEle(index).name==='triangle'?f.getEle(index).color+f.opa2hex(f.getEle(index).opacity):'',
-              zIndex:f.getEle(index).zIndex,
-              transform:`
-                translate(calc(${f.getEle(index).translateX}px - 50%),calc(${f.getEle(index).translateY}px - 50%)) 
-                rotate(${f.getEle(index).angle}deg) 
-                scale(${f.getEle(index).scaleX},${f.getEle(index).scaleY})
-              `
+              backgroundColor:ele.name!=='triangle'?ele.color+f.opa2hex(ele.opacity):'',
+              borderBottomColor:ele.name==='triangle'?ele.color+f.opa2hex(ele.opacity):'',
             }"
-            class="centered"></div>
-            <textarea v-if="f.getEle(index)?.type === 'text'"
-            v-bind:class="[gameData.editSelect === f.getEle(index)?'selected':'']"
+            v-bind:id="'ele'+index"></div>
+            <textarea v-if="ele?.type === 'text'"
+            v-bind:class="[gameData.editSelect === ele?'selected':'']"
             v-bind:style="{
-              color:f.getEle(index).color+f.opa2hex(f.getEle(index).opacity),
-              zIndex:f.getEle(index).zIndex,
-              fontFamily:f.getEle(index).name,
-              transform:`
-                translate(${f.getEle(index).translateX}px,${f.getEle(index).translateY}px) 
-                rotate(${f.getEle(index).angle}deg) 
-                scale(${f.getEle(index).scaleX},${f.getEle(index).scaleY})
-              `,
-              resize: gameData.editSelect === f.getEle(index)?'both':'',
-              width:slot.w+'px',
-              height:slot.h+'px',
-              fontSize:f.getEle(index).fontSize+'px',
-              textAlign:f.getEle(index).textAlign
+              color:ele.color+f.opa2hex(ele.opacity),
+              fontFamily:ele.name,
+              resize: gameData.editSelect === ele?'both':'',
+              width:ele.width+'px',
+              height:ele.height+'px',
+              fontSize:ele.fontSize+'px',
+              textAlign:ele.textAlign
             }"
+            v-bind:id="'ele'+index"
             v-on:keydown.stop
-            >{{f.getEle(index).name}}</textarea>
+            >{{ele.name}}</textarea>
           </div>
         </div>
         <div id="selectors">

@@ -29,6 +29,7 @@
   border: solid black 2px;
   display: inline-block;
   position: absolute;
+  z-index: -999999;
 }
 .slotFilled {
   border: solid transparent 2px !important;

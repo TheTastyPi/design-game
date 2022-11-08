@@ -20,8 +20,6 @@ const options = {
   ]
 };
 const defaultEleProp = {
-  translateX: 0,
-  translateY: 0,
   scaleX: 1,
   scaleY: 1,
   angle: 0,
@@ -33,22 +31,19 @@ function openTab(type) {
   app.tabOpen = app.tabOpen !== type ? type : "";
 }
 function selectEle(ele, index) {
+  if (gameData.designs[gameData.level].length === 10) return;
   gameData.selected = { ...ele };
   gameData.selectIndex = index;
   gameData.editSelect = null;
 }
-function interactEle(index) {
-  if (getEle(index)) {
-    if (!gameData.selected) editEle(index);
-  } else placeEle(index);
-}
-function placeEle(index) {
+async function placeEle(index) {
   if (!gameData.selected) return;
   let ele = gameData.selected;
-  gameData.designs[gameData.level][index] = ele;
+  let i = gameData.designs[gameData.level].push(ele) - 1;
   gameData.editSelect = ele;
   gameData.selected = null;
   gameData.selectIndex = null;
+  let slot = levels[gameData.level][index];
   Object.assign(ele, defaultEleProp);
   if (ele.type === "shape") {
     Object.assign(ele, { color: "#add8e6" });
@@ -57,13 +52,19 @@ function placeEle(index) {
     Object.assign(ele, {
       color: "#000000",
       fontSize: 12,
-      textAlign: "left"
+      textAlign: "left",
+      width: slot.w,
+      height: slot.h
     });
   }
+  await Vue.nextTick();
+  ele.translateX = slot.x + slot.w / 2 + 2 - $("ele" + i).offsetWidth / 2;
+  ele.translateY = slot.y + slot.h / 2 + 2 - $("ele" + i).offsetHeight / 2;
   app.tabOpen = "";
 }
-function editEle(index) {
-  gameData.editSelect = getEle(index);
+function editEle(ele) {
+  if (gameData.selected) return;
+  gameData.editSelect = ele;
 }
 function deselect() {
   gameData.editSelect = null;

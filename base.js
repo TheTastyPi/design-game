@@ -19,7 +19,7 @@ var app = new Vue({
 });
 function startLevel(n) {
   gameData.level = n;
-  gameData.designs[n] = Array(levels[n].length);
+  gameData.designs[n] = [];
 }
 function gameOver() {
   // todo
@@ -42,7 +42,7 @@ function getEle(index) {
   return gameData.designs[gameData.level]?.[index];
 }
 function opa2hex(opa) {
-  let hex = Math.floor(opa*255).toString(16);
-  if (hex.length === 1) hex = "0"+hex;
+  let hex = Math.floor(opa * 255).toString(16);
+  if (hex.length === 1) hex = "0" + hex;
   return hex;
 }
